@@ -1,15 +1,34 @@
 # DataDog Homework by Jolan
 
 ## How to
+- Run the app: `make run`
+- Run the tests: `make test`
 
-## How does this works 
-### Dependancies
-https://github.com/kennethreitz/clint
+## How does it work:
+### Technologies
+The application is running on Python 3 and a few python dependencies like [clint](https://github.com/kennethreitz/clint) for the command line tools utils and `unittest`, [`coverage`](https://coverage.readthedocs.io/en/v4.5.x/) and [`freezegun`](https://github.com/spulec/freezegun) for testing.
 
-## Amelioration
-ideallement, on voudrais pas analyser les logs precedent mais on peut pas trop savoir si on est super en retard dans notre analyse ou si on vient de nous passer un log super vieux.
-I could got to end of the line on class creation but what if we right faster than we read?
+The application use the Python 3 type hint feature and check it with [mypy](https://mypy.readthedocs.io/en/latest/index.html).
 
+It is also leveraging Docker to run.
+
+### Code architecture
+The CLI application is organized in one folder, `dd_homework`, and three classes. The `LogAnalyser` which is responsible for reading the file and creating a `StatData` object which is going to contains all the useful information we gather about the website traffic. Every 10 seconds, we are going to pass this `StatData` object to the `LogPrinter` which is responsible for showing the different stats and alert if anything is wrong.
+
+That way, the different logic of parsing the log lines, accumulating data and handling those data to create report and alert are separated concerns and can be changed and extended respectivly.
+
+### Parameters
+The CLI application can takes three parameters:
+- `-t`, `--alert_threshold` which is the threshold to hit before alerting for high traffic.
+- `-f`, `--file` which is the file containing your HTTP logs.
+- `-l`, `--log_limit` which is the max number of sections we want to show every 10 seconds.
+
+As this is running in Docker, you'll have to update the `ENTRYPOINT ["python", "main.py"]` to specify one or more parameters. If you don't the application will still run with some default values.
+
+## Improving the application design
+- We could add a ton of other metrics.
+- The alerting logic should most likely be de-coupled from the clint package. It will enable easier tests and an easier switch of the presentation layer if necessary (like moving it to a web interface).
+- 
 
 ## Initial Description
 ***********************************
@@ -26,7 +45,7 @@ Example log lines:
 127.0.0.1 - frank [09/May/2018:16:00:42 +0000] "POST /api/user HTTP/1.0" 200 34
 127.0.0.1 - mary [09/May/2018:16:00:42 +0000] "POST /api/user HTTP/1.0" 503 12
 ```
- - Display stats every 10s about the traffic during those 10s: the sections of the web site with the most hits, as well as interesting summary statistics on the traffic as a whole. 
+ - Display stats every 10s about the traffic during those 10s: the sections of the web site with the most hits, as well as interesting summary statistics on the traffic as a whole.
     A section is defined as being what's before the second '/' in the resource section of the log line. For example, the section for "/pages/create" is "/pages"
  - Make sure a user can keep the app running and monitor the log file continuously
  - Whenever total traffic for the past 2 minutes exceeds a certain number on average, add a message saying that “High traffic generated an alert - hits = {value}, triggered at {time}”. The default threshold should be 10 requests per second, and should be overridable.
