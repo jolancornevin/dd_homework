@@ -11,9 +11,8 @@ def get_user_params():
         '-t', '--alert_threshold', type=int, help='The threshold to hit before alerting for high traffic'
     )
 
-    # TODO add , encoding='UTF-8' for python 3
     parser.add_argument(
-        '-f', '--file', type=argparse.FileType('r'),
+        '-f', '--file', type=argparse.FileType('r', encoding='UTF-8'),
         help='The file containing your HTTP logs', default='/tmp/access.log'
     )
     parser.add_argument(
@@ -26,7 +25,5 @@ def get_user_params():
 
 
 if __name__ == '__main__':
-    # TODO add requirement.txt
-
     alert_threshold, log_limit, log_file = get_user_params()
     LogAnalyser(alert_threshold, log_limit, log_file).analyse()

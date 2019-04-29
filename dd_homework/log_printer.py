@@ -3,7 +3,6 @@
 from datetime import datetime, timedelta
 
 from clint.textui import colored, columns, puts  # type: ignore
-
 from stat_data import StatData
 
 
@@ -56,16 +55,20 @@ class LogPrinter:
 
         for user, hits in stat_data.users.items():
             if hits > total_hits * self.abusing_user_threshold / 100:
-                puts(colored.red(
-                    '  /!\ {} takes more than {}% of your traffic ({}%)'.format(
-                        user, self.abusing_user_threshold, hits * 100 / total_hits
+                puts(
+                    colored.red(
+                        '  /!\ {} takes more than {}% of your traffic ({}%)'.format(
+                            user, self.abusing_user_threshold, hits * 100 / total_hits
+                        )
                     )
-                ))
+                )
 
         for error, lines in stat_data.errors.items():
-            puts(colored.red(
-                '  /!\ You had {}:'.format(error)
-            ))
+            puts(
+                colored.red(
+                    '  /!\ You had {}:'.format(error)
+                )
+            )
             puts(colored.red(
                 ''.join(['    - {}'.format(line) for line in lines])
             ))

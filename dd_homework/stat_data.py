@@ -7,6 +7,7 @@ from datetime import datetime
 
 class StatData:
     """Represent every traffic data we can accumulate over a given period of time."""
+
     def __init__(self, date: datetime) -> None:
         self.reset_obj(date)
 

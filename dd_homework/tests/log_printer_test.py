@@ -2,10 +2,9 @@
 
 from datetime import datetime
 from unittest import TestCase
-from unittest.mock import Mock, call, patch
+from unittest.mock import call, patch
 
 from freezegun import freeze_time  # type: ignore
-
 from log_printer import LogPrinter
 from stat_data import StatData
 
@@ -18,8 +17,7 @@ class LogPrinterTest(TestCase):
         self.stat = StatData(self.now)
 
     @patch('log_printer.colored.blue')
-    @patch('log_printer.puts')
-    def test_show(self, p_puts, p_blue):
+    def test_show(self, p_blue):
         colored_return_value = 'colored_return_value'
         p_blue.return_value = colored_return_value
 
@@ -40,7 +38,7 @@ class LogPrinterTest(TestCase):
     @patch('log_printer.colored.green')
     @patch('log_printer.colored.red')
     @patch('log_printer.puts')
-    def test_alert_hight_traffic(self, p_puts, p_red, p_green):
+    def test_alert_high_traffic(self, p_puts, p_red, p_green):
         red_colored_return_value = 'red_colored_return_value'
         p_red.return_value = red_colored_return_value
 

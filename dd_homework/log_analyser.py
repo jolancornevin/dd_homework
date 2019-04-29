@@ -1,10 +1,10 @@
 # -*- coding: utf-8 -*-
 
+import os
 import re
-from time import sleep
-from collections import defaultdict
 from datetime import datetime, timedelta
-from typing import Generator, TextIO, Tuple
+from time import sleep
+from typing import TextIO, Tuple
 
 from log_printer import LogPrinter
 from stat_data import StatData
@@ -33,13 +33,14 @@ class LogAnalyser:
         :param log_file:
         :yield: line by line of the file until you close the connection
         """
+        log_file.seek(0, os.SEEK_END)
         while True:
             line = log_file.readline()
             # If nothing is new in the file, we pause and loop again.
             if not line:
                 sleep(cls.SLEEP_TIME)
                 # We still want to return an empty line to alert if there is no traffic.
-                yield (datetime.now(),) + ('', ) * 6  # type: ignore
+                yield (datetime.now(),) + ('',) * 6  # type: ignore
                 continue
 
             yield cls.extract_lines_info(line)
@@ -65,7 +66,7 @@ class LogAnalyser:
             self._analyse_line(*args)
 
     def _analyse_line(
-        self, date: datetime, line: str, section: str, authuser: str, http_verb: str, status: str, bytes: str
+            self, date: datetime, line: str, section: str, authuser: str, http_verb: str, status: str, bytes: str
     ) -> None:
         """
         Compute traffic stat with the log line and eventually print stats to the user.

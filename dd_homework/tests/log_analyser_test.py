@@ -5,7 +5,6 @@ from unittest import TestCase
 from unittest.mock import Mock, call, patch
 
 from freezegun import freeze_time  # type: ignore
-
 from log_analyser import LogAnalyser
 
 
@@ -54,4 +53,3 @@ class LogAnalyserTest(TestCase):
                 )
             ])
             p_stat_data_reset_obj.assert_called_once_with(last_log_date)
-
