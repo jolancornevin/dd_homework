@@ -1,13 +1,12 @@
-#!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-import unittest
 from datetime import datetime
+from unittest import TestCase
 
-from src.stat_data import StatData
+from stat_data import StatData
 
 
-class StatDataTest(unittest.TestCase):
+class StatDataTest(TestCase):
     def setUp(self):
         self.now = datetime.now()
         self.stat = StatData(self.now)
@@ -55,7 +54,3 @@ class StatDataTest(unittest.TestCase):
         self.assertEqual(self.stat.stats['/report']['status']['404'], 1)
         self.assertEqual(self.stat.stats['/report']['hit'], 1)
         self.assertEqual(self.stat.stats['/report']['bytes'], 123)
-
-
-if __name__ == '__main__':
-    unittest.main()

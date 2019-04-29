@@ -1,0 +1,13 @@
+FROM python:3
+RUN touch /tmp/access.log
+WORKDIR /usr/src
+
+ADD ./requirement.txt /usr/src
+ADD ./Makefile /usr/src
+ADD ./dd_homework /usr/src/dd_homework
+RUN make install
+
+WORKDIR /usr/src/dd_homework
+RUN mypy .
+RUN python -m coverage run -m unittest tests
+RUN python -m coverage report -m

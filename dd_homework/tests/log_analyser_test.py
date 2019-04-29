@@ -1,13 +1,12 @@
-#!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
 from datetime import datetime
 from unittest import TestCase
+from unittest.mock import Mock, call, patch
 
-from freezegun import freeze_time
-from mock import Mock, call, patch
+from freezegun import freeze_time  # type: ignore
 
-from src.log_analyser import LogAnalyser
+from log_analyser import LogAnalyser
 
 
 class LogAnalyserTest(TestCase):
@@ -23,7 +22,7 @@ class LogAnalyserTest(TestCase):
         self.analyser = LogAnalyser(10, 10, self.log_file)
 
     @freeze_time('2018-05-09 16:00:41')
-    @patch('src.log_analyser.sleep')
+    @patch('log_analyser.sleep')
     def test_analyse(self, p_sleep):
         p_stat_data_add_log_line = Mock()
         p_stat_data_reset_obj = Mock()
@@ -31,7 +30,10 @@ class LogAnalyserTest(TestCase):
         self.analyser.stat_data.reset_obj = p_stat_data_reset_obj
 
         with patch.object(self.analyser, 'log_printer') as p_log_printer:
-            self.analyser.analyse()
+            try:
+                self.analyser.analyse()
+            except RuntimeError:  # Will be raised by the mock.side_effect...
+                pass
 
             p_sleep.assert_called_once_with(self.analyser.SLEEP_TIME)
 

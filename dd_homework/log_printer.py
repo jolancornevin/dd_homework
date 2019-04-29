@@ -2,11 +2,13 @@
 # -*- coding: utf-8 -*-
 from datetime import datetime, timedelta
 
-from clint.textui import colored, columns, puts
+from clint.textui import colored, columns, puts  # type: ignore
+
+from stat_data import StatData
 
 
-class LogPrinter(object):
-    def __init__(self, alert_threshold=10, log_limit=10, abusing_user_threshold=30):
+class LogPrinter:
+    def __init__(self, alert_threshold=10, log_limit=10, abusing_user_threshold=30) -> None:
         self.alert_threshold = alert_threshold
         self.log_limit = log_limit
         self.abusing_user_threshold = abusing_user_threshold
@@ -15,7 +17,7 @@ class LogPrinter(object):
         self.last_two_minutes_report_date = datetime.now()
         self.is_alerting = False
 
-    def show(self, date, stat_data):
+    def show(self, date: datetime, stat_data: StatData) -> None:
         """
         Prints traffic information to the console.
 
@@ -35,7 +37,7 @@ class LogPrinter(object):
             self.print_alert_messages(total_hit, date, stat_data)
             self.print_stat_table(stat_data)
 
-    def print_alert_messages(self, total_hits, date, stat_data):
+    def print_alert_messages(self, total_hits: int, date: datetime, stat_data: StatData) -> None:
         """Alert the user about worrying stats"""
         if date > self.last_two_minutes_report_date + timedelta(minutes=2):
             if self.total_hit_over_two_minutes > self.alert_threshold:
@@ -52,7 +54,7 @@ class LogPrinter(object):
             self.total_hit_over_two_minutes = 0
             self.last_two_minutes_report_date = date
 
-        for user, hits in stat_data.users.iteritems():
+        for user, hits in stat_data.users.items():
             if hits > total_hits * self.abusing_user_threshold / 100:
                 puts(colored.red(
                     '  /!\ {} takes more than {}% of your traffic ({}%)'.format(
@@ -60,7 +62,7 @@ class LogPrinter(object):
                     )
                 ))
 
-        for error, lines in stat_data.errors.iteritems():
+        for error, lines in stat_data.errors.items():
             puts(colored.red(
                 '  /!\ You had {}:'.format(error)
             ))
@@ -68,8 +70,8 @@ class LogPrinter(object):
                 ''.join(['    - {}'.format(line) for line in lines])
             ))
 
-    def print_stat_table(self, stat_data):
-        def _print_column(section, hits, bytes, status, verbs):
+    def print_stat_table(self, stat_data: StatData) -> None:
+        def _print_column(section: str, hits: str, bytes: str, status: str, verbs: str) -> None:
             """A small helper to show a report line"""
             puts(columns([section, 20], [hits, 5], [bytes, 8], [status, 10], [verbs, 10]))
 
@@ -84,12 +86,12 @@ class LogPrinter(object):
         )[:self.log_limit]:
             # Compute the status line as a section may return different status over a period of time.
             status_line = ''
-            for verb, hit in stat['status'].iteritems():
+            for verb, hit in stat['status'].items():
                 status_line += '{} x {} '.format(verb, hit)
 
             # Compute the HTTP verb line as a section may be queried with different verbs over a period of time.
             verbs_line = ''
-            for verb, hit in stat['http_verb'].iteritems():
+            for verb, hit in stat['http_verb'].items():
                 verbs_line += '{} x {} '.format(verb, hit)
 
             # Compute the color of the section depending on the status that the section returned.

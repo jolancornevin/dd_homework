@@ -1,16 +1,16 @@
-#!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
 import re
 from time import sleep
 from collections import defaultdict
 from datetime import datetime, timedelta
+from typing import Generator, TextIO, Tuple
 
 from log_printer import LogPrinter
 from stat_data import StatData
 
 
-class LogAnalyser(object):
+class LogAnalyser:
     # The common logfile format is as follows:
     #   remotehost rfc931 authuser [date] "request" status bytes
     LOG_REGEX = re.compile(r'([\d\.]+) (.+?) (.+?) \[(.*?)\] "(.*?) (.*?) (.*?)" (\d+) (\d+)')
@@ -20,14 +20,13 @@ class LogAnalyser(object):
     SLEEP_TIME = 0.1
     DATE_FORMAT = '%d/%b/%Y:%H:%M:%S'
 
-    def __init__(self, alert_threshold, log_limit, log_file):
+    def __init__(self, alert_threshold: int, log_limit: int, log_file: TextIO) -> None:
         self.log_file = log_file
         self.stat_data = StatData(datetime.now())
-
         self.log_printer = LogPrinter(alert_threshold, log_limit)
 
     @classmethod
-    def read_file(cls, log_file):
+    def read_file(cls, log_file: TextIO):
         """
         Read the file indefinitely and yield it's lines.
 
@@ -40,15 +39,15 @@ class LogAnalyser(object):
             if not line:
                 sleep(cls.SLEEP_TIME)
                 # We still want to return an empty line to alert if there is no traffic.
-                yield (datetime.now(),) + (None,) * 6
+                yield (datetime.now(),) + ('', ) * 6  # type: ignore
                 continue
 
             yield cls.extract_lines_info(line)
 
     @classmethod
-    def extract_lines_info(cls, line):
+    def extract_lines_info(cls, line: str) -> Tuple[datetime, str, str, str, str, str, str]:
         """Extract data from the log line via our regex and return those that we are interested in."""
-        _, rfc931, authuser, date, http_verb, route, http_method, status, bytes = cls.LOG_REGEX.match(
+        _, rfc931, authuser, date, http_verb, route, http_method, status, bytes = cls.LOG_REGEX.match(  # type: ignore
             line
         ).groups()
 
@@ -57,7 +56,7 @@ class LogAnalyser(object):
         date = datetime.strptime(date.split(' ')[0], cls.DATE_FORMAT)
         return date, line, section, authuser, http_verb, status, bytes
 
-    def analyse(self):
+    def analyse(self) -> None:
         """
         Read the file, analyse each line and eventually shows stat about the traffic.
         :return:
@@ -65,7 +64,9 @@ class LogAnalyser(object):
         for args in self.read_file(self.log_file):
             self._analyse_line(*args)
 
-    def _analyse_line(self, date, line, section, authuser, http_verb, status, bytes):
+    def _analyse_line(
+        self, date: datetime, line: str, section: str, authuser: str, http_verb: str, status: str, bytes: str
+    ) -> None:
         """
         Compute traffic stat with the log line and eventually print stats to the user.
 

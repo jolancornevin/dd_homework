@@ -1,0 +1,4 @@
+clint==0.5.1
+coverage==4.5.3
+freezegun==0.3.11
+mypy==0.701

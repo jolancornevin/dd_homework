@@ -1,9 +1,8 @@
-#!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
 import argparse
 
-from src.log_analyser import LogAnalyser
+from log_analyser import LogAnalyser
 
 
 def get_user_params():

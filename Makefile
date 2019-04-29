@@ -1,3 +1,10 @@
+run:
+	docker build -t python-dd-homework .
+	docker run python-dd-homework
+
+install:
+	pip install -r requirement.txt
+
 test:
-	python -m coverage run --source=src -m unittest tests
-	python -m coverage report -m
+	docker build -f Dockerfile.test -t python-dd-homework-test .
+	docker run python-dd-homework-test
